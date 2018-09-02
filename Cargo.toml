@@ -1,0 +1,12 @@
+[package]
+name = "outer_cgi"
+version = "0.2.0"
+authors = ["Solra Bizna <solra@bizna.name>"]
+
+[dependencies]
+ctrlc = "3.1"
+crossbeam-channel = "0.1"
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+nix = "0.10"
