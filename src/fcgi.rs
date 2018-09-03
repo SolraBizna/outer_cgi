@@ -755,7 +755,6 @@ where H: 'static + Fn(&mut IO, HashMap<String, String>) -> io::Result<i32>
     std::mem::drop(listen_rx);
     std::mem::drop(worker_tx);
     for thread in threads {
-        
         thread.join().expect("Error joining worker thread")
     }
     exit_code
