@@ -203,7 +203,7 @@ impl OptionHandler for UnixSocketOptions {
                         return OptionParseOutcome::Failed
                     },
                 };
-                match libc::uid_t::from_str_radix(arg, 8) {
+                match libc::uid_t::from_str_radix(arg, 10) {
                     Err(_) => {
                         eprintln!("Invalid argument for --chown");
                         return OptionParseOutcome::Failed
@@ -222,7 +222,7 @@ impl OptionHandler for UnixSocketOptions {
                         return OptionParseOutcome::Failed
                     },
                 };
-                match libc::gid_t::from_str_radix(arg, 8) {
+                match libc::gid_t::from_str_radix(arg, 10) {
                     Err(_) => {
                         eprintln!("Invalid argument for --chgrp");
                         return OptionParseOutcome::Failed
@@ -346,7 +346,7 @@ impl OptionHandler for UnixOSOptions {
                         return OptionParseOutcome::Failed
                     },
                 };
-                match libc::uid_t::from_str_radix(arg, 8) {
+                match libc::uid_t::from_str_radix(arg, 10) {
                     Err(_) => {
                         eprintln!("Invalid argument for --setuid");
                         return OptionParseOutcome::Failed
@@ -365,7 +365,7 @@ impl OptionHandler for UnixOSOptions {
                         return OptionParseOutcome::Failed
                     },
                 };
-                match libc::gid_t::from_str_radix(arg, 8) {
+                match libc::gid_t::from_str_radix(arg, 10) {
                     Err(_) => {
                         eprintln!("Invalid argument for --setgid");
                         return OptionParseOutcome::Failed
