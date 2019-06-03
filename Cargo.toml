@@ -2,6 +2,9 @@
 name = "outer_cgi"
 version = "0.2.0"
 authors = ["Solra Bizna <solra@bizna.name>"]
+description = "A barebones CGI/FCGI wrapper."
+license = "Zlib"
+repository = "https://github.com/SolraBizna/outer_cgi"
 
 [dependencies]
 ctrlc = "3.1"
