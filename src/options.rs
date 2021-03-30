@@ -1,5 +1,5 @@
 #[cfg(unix)]
-use unix;
+use crate::unix;
 use std;
 use std::io;
 use std::slice::Iter;

@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::net::TcpStream;
 use std::slice::Iter;
 use super::{IO, Listener};
-use options::{OptionHandler, OptionParseOutcome};
+use crate::options::{OptionHandler, OptionParseOutcome};
 use std::panic::RefUnwindSafe;
 use ctrlc;
 
