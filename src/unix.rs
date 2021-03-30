@@ -99,10 +99,7 @@ fn stderr_to_syslog(identifier: Option<String>) {
 /// - Detects whether FD 0 is a listen socket, and returns a Listener for it if
 /// so.
 /// - If FD 2 was invalid **IOR** FD 0 was a listen socket, redirects stderr
-/// to syslog, with the provided identifier.
-///
-/// `ident`: The identifying name to pass to openlog. It must not contain
-/// an embedded NUL, or `fix_fds` may panic.
+/// to syslog, with an automatically generated identifier.
 pub fn fix_fds(env: &HashMap<String,String>) -> Option<Box<dyn Listener>> {
     // let's ensure that all standard file descriptors are valid
     let fd0_ok = fd_ok(0);
