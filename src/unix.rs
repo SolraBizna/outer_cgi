@@ -42,7 +42,7 @@ fn stderr_to_syslog(identifier: Option<String>) {
     if write_fd != 2 {
         nix::unistd::dup2(write_fd, 2)
             .expect("Unexpected error calling dup2 on syslog diversion pipe");
-        nix::unistd::close(write_fd).is_ok(); // ignore error
+        let _ = nix::unistd::close(write_fd); // ignore error
     }
     let read = unsafe { File::from_raw_fd(read_fd) };
     // identifier needs to hang around as long as we keep calling syslog, or
@@ -60,7 +60,7 @@ fn stderr_to_syslog(identifier: Option<String>) {
     use nix::unistd::ForkResult;
     match nix::unistd::fork() {
         Ok(ForkResult::Child) => {
-            nix::unistd::close(write_fd).is_ok(); // ignore result
+            let _ = nix::unistd::close(write_fd); // ignore result
             unsafe {
                 libc::openlog(identifier.as_ptr(), 0, libc::LOG_USER);
             }
@@ -79,7 +79,7 @@ fn stderr_to_syslog(identifier: Option<String>) {
             std::process::exit(0)
         },
         Ok(ForkResult::Parent{..}) => {
-            nix::unistd::close(read_fd).is_ok(); // ignore result
+            let _ = nix::unistd::close(read_fd); // ignore result
         },
         Err(_) => {
             // panic, for all the good it'll do
@@ -103,7 +103,7 @@ fn stderr_to_syslog(identifier: Option<String>) {
 ///
 /// `ident`: The identifying name to pass to openlog. It must not contain
 /// an embedded NUL, or `fix_fds` may panic.
-pub fn fix_fds(env: &HashMap<String,String>) -> Option<Box<Listener>> {
+pub fn fix_fds(env: &HashMap<String,String>) -> Option<Box<dyn Listener>> {
     // let's ensure that all standard file descriptors are valid
     let fd0_ok = fd_ok(0);
     let fd1_ok = fd_ok(1);

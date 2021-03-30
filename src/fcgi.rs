@@ -180,12 +180,10 @@ impl<R: io::Read> Iterator for KeyValueReader<R> {
             Some(Err(x)) => return Some(Err(x)),
             None => return Some(Err(io::Error::from(io::ErrorKind::UnexpectedEof))),
         } as usize;
-        let mut key_buffer = Vec::with_capacity(key_length);
-        let mut value_buffer = Vec::with_capacity(value_length);
-        unsafe {
-            key_buffer.set_len(key_length);
-            value_buffer.set_len(value_length);
-        }
+        let mut key_buffer = Vec::new();
+        let mut value_buffer = Vec::new();
+        key_buffer.resize(key_length, 0);
+        value_buffer.resize(value_length, 0);
         match self.reader.read_exact(key_buffer.as_mut_slice()) {
             Ok(()) => (),
             Err(x) => return Some(Err(x)),
@@ -448,7 +446,7 @@ impl<'a, 'z> Instance<'a, 'z> {
     }
     fn handle_request<H>(&mut self, handler: &H,
                          mut env: HashMap<String,String>) -> io::Result<()>
-    where H: Fn(&mut IO, HashMap<String, String>)
+    where H: Fn(&mut dyn IO, HashMap<String, String>)
                 -> io::Result<i32> {
         // get a BEGIN_REQUEST record
         self.begin_request()?;
@@ -476,7 +474,7 @@ impl<'a, 'z> Instance<'a, 'z> {
     pub fn handle_requests<H>(&mut self, handler: &H,
                               static_env: &HashMap<String,String>)
                               -> io::Result<()>
-    where H: Fn(&mut IO, HashMap<String, String>) -> io::Result<i32> {
+    where H: Fn(&mut dyn IO, HashMap<String, String>) -> io::Result<i32> {
         // keep_conn is initially true; it will be set to false when we receive
         // a BEGIN_REQUEST without KEEP_CONN. In the usual case, the first
         // BEGIN_REQUEST would lack KEEP_CONN, and therefore we would loop only
@@ -633,11 +631,11 @@ impl OptionHandler for Options {
 // listener must be in a box so it can be sent to the listen thread. We could
 // use a reference and lie about its lifetime, but we've already lied to the
 // borrow checker more than is good.
-pub fn listen_loop<H>(mut listener: Box<Listener>, handler: H,
+pub fn listen_loop<H>(mut listener: Box<dyn Listener>, handler: H,
                       options: Options,
                       static_env: &HashMap<String,String>)
                       -> i32
-where H: 'static + Fn(&mut IO, HashMap<String, String>) -> io::Result<i32>
+where H: 'static + Fn(&mut dyn IO, HashMap<String, String>) -> io::Result<i32>
     + Sync + Send + Copy + RefUnwindSafe {
     use crossbeam_channel as cc;
     // Lie to the borrow checker. The difficult-to-encode assumption is that
@@ -673,8 +671,8 @@ where H: 'static + Fn(&mut IO, HashMap<String, String>) -> io::Result<i32>
         loop {
             let to_send = listener.accept_connection();
             let should_break = to_send.is_err();
-            // If sending failed, we're on our way down anyway.
-            listen_tx.send(to_send).is_ok();
+            // If sending failed, we're on our way down too...
+            if !listen_tx.send(to_send).is_ok() { break }
             if should_break { break }
         }
     }).expect("Error spawning listen thread");

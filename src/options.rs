@@ -34,7 +34,7 @@ impl NullOSOptions {
     pub fn post_setup(self) -> io::Result<()> { Ok(()) }
 }
 
-pub fn fix_fds(env: &HashMap<String,String>) -> Option<Box<Listener>> {
+pub fn fix_fds(env: &HashMap<String,String>) -> Option<Box<dyn Listener>> {
     #[cfg(unix)] return unix::fix_fds(env);
     #[cfg(not(unix))] return None;
 }
@@ -158,7 +158,7 @@ impl<T: AddressType> OptionHandler for BindOptions<T> {
 
 /// Handles the whole command line. Returns true if the whole command line was
 /// valid, false otherwise.
-pub fn handle_command_line<'a>(handlers: &mut [&mut OptionHandler],
+pub fn handle_command_line<'a>(handlers: &mut [&mut dyn OptionHandler],
                                cmdline: Iter<String>) -> bool {
     let mut next = cmdline;
     let mut ok = true;

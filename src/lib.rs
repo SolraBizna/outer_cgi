@@ -220,7 +220,7 @@ impl<R: BufRead, W: Write> IO for DualIO<R, W> {
 /// [1]: https://tools.ietf.org/html/rfc3875
 pub fn main<I, H>(init: I, handler: H) -> !
 where I: 'static + Fn(u32),
-      H: 'static + Fn(&mut IO, HashMap<String, String>) -> io::Result<i32>
+      H: 'static + Fn(&mut dyn IO, HashMap<String, String>) -> io::Result<i32>
     + Sync + Send + Copy + RefUnwindSafe {
     use std::process::exit;
     match sub_main(init, handler) {
@@ -234,7 +234,7 @@ where I: 'static + Fn(u32),
 
 fn sub_main<I, H>(init: I, handler: H) -> io::Result<i32>
 where I: 'static + Fn(u32),
-      H: 'static + Fn(&mut IO, HashMap<String, String>) -> io::Result<i32>
+      H: 'static + Fn(&mut dyn IO, HashMap<String, String>) -> io::Result<i32>
     + Sync + Send + Copy + RefUnwindSafe {
     let args: Vec<String> = std::env::args().collect();
     let static_env: HashMap<String, String> = std::env::vars().collect();
@@ -293,7 +293,7 @@ where I: 'static + Fn(u32),
                     Ok(1)
                 }
                 else {
-                    let listener: Box<Listener> =
+                    let listener: Box<dyn Listener> =
                     if let Some(list)=static_env.get("FCGI_WEB_SERVER_ADDRS") {
                         Box::new(ParanoidTcpListener::new(bind_options.addr
                                                           .unwrap(), list)?)
@@ -334,7 +334,7 @@ where I: 'static + Fn(u32),
                         eprintln!("WARNING: Value of FCGI_WEB_SERVER_ADDRS is \
                                    ignored for non-TCP sockets!");
                     }
-                    let mut listener
+                    let listener
                         = unix::listen(bind_options.addr.unwrap().as_path(),
                                        unix_socket_options)?;
                     os_options.post_setup()?;
