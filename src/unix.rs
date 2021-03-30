@@ -58,7 +58,7 @@ fn stderr_to_syslog(identifier: Option<String>) {
     });
     let identifier = CString::new(identifier).unwrap();
     use nix::unistd::ForkResult;
-    match nix::unistd::fork() {
+    match unsafe{nix::unistd::fork()} {
         Ok(ForkResult::Child) => {
             let _ = nix::unistd::close(write_fd); // ignore result
             unsafe {
@@ -311,9 +311,9 @@ impl UnixOSOptions {
             // use libc::_exit instead of std::process::exit because we don't
             // *want* to clean anything up
             use nix::unistd::ForkResult;
-            match nix::unistd::fork()? {
+            match unsafe{nix::unistd::fork()}? {
                 ForkResult::Child =>
-                    match nix::unistd::fork()? {
+                    match unsafe{nix::unistd::fork()}? {
                         ForkResult::Child => (),
                         _ => unsafe { libc::_exit(0) },
                     },
