@@ -118,7 +118,7 @@ type RecordType = u8;
 type RequestId = u16;
 
 fn read_length<T: io::Read>(reader: &mut T) -> Option<io::Result<u32>> {
-    let mut b1: [u8; 1] = unsafe { std::mem::uninitialized() };
+    let mut b1 = [0u8; 1];
     match reader.read_exact(&mut b1[..]) {
         Ok(()) => (),
         Err(ref x) if x.kind() == io::ErrorKind::UnexpectedEof
@@ -127,7 +127,7 @@ fn read_length<T: io::Read>(reader: &mut T) -> Option<io::Result<u32>> {
     }
     if b1[0] & 0x80 != 0 {
         // it is a 31-bit length
-        let mut b2: [u8; 3] = unsafe { std::mem::uninitialized() };
+        let mut b2 = [0u8; 3];
         match reader.read_exact(&mut b2[..]) {
             Ok(()) => (),
             Err(x) => return Some(Err(x)),
@@ -312,7 +312,7 @@ impl<'a, 'z> Instance<'a, 'z> {
             current_reqid: NULL_REQUEST_ID,
             current_input: 0,
             receiver: LowLevelReceiver {
-                recvbuf: unsafe { std::mem::uninitialized() },
+                recvbuf: [0u8; RECVBUF_SIZE],
                 recvbufpos: 0,
                 recvbufend: 0,
             },
@@ -320,7 +320,7 @@ impl<'a, 'z> Instance<'a, 'z> {
             keep_conn: true,
             input_has_ended: true,
             remaining_slice_in_input: &[],
-            sendbuf: unsafe { std::mem::uninitialized() },
+            sendbuf: [0u8; SENDBUF_SIZE],
             stdout_pos: 0,
         }
     }
