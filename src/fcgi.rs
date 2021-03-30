@@ -713,29 +713,29 @@ where H: 'static + Fn(&mut dyn IO, HashMap<String, String>) -> io::Result<i32>
     }
     let exit_code;
     loop {
-        let result = select_loop! {
-            recv(ctrlc_rx, _) => {
+        let result = select! {
+            recv(ctrlc_rx) -> _ => {
                 Some(0)
             },
-            recv(listen_rx, result) => {
+            recv(listen_rx) -> result => {
                 match result {
-                    Err(e) => {
+                    Err(_) => {
+                        // The listen socket closed down... An error was
+                        // (probably) already printed.
+                        Some(1)
+                    },
+                    Ok(Err(e)) => {
                         eprintln!("Error on listen socket: {}", e);
                         // Gracefully shut down after all outstanding
                         // connections are closed
                         Some(1)
                     },
-                    Ok(sock) => {
+                    Ok(Ok(sock)) => {
                         worker_tx.send(sock).expect("Error dispatching \
                                                      incoming connection");
                         None
                     },
                 }
-            },
-            disconnected() => {
-                eprintln!("Internal error: Control-C and listen threads both \
-                           died!");
-                Some(1)
             },
         };
         match result {

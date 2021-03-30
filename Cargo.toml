@@ -8,7 +8,7 @@ repository = "https://github.com/SolraBizna/outer_cgi"
 
 [dependencies]
 ctrlc = "3.1"
-crossbeam-channel = "0.1"
+crossbeam-channel = "0.5"
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"
