@@ -180,10 +180,8 @@ impl<R: io::Read> Iterator for KeyValueReader<R> {
             Some(Err(x)) => return Some(Err(x)),
             None => return Some(Err(io::Error::from(io::ErrorKind::UnexpectedEof))),
         } as usize;
-        let mut key_buffer = Vec::new();
-        let mut value_buffer = Vec::new();
-        key_buffer.resize(key_length, 0);
-        value_buffer.resize(value_length, 0);
+        let mut key_buffer = vec![0; key_length];
+        let mut value_buffer = vec![0; value_length];
         match self.reader.read_exact(key_buffer.as_mut_slice()) {
             Ok(()) => (),
             Err(x) => return Some(Err(x)),
