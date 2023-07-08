@@ -1,11 +1,14 @@
+use std::{
+    collections::HashMap,
+    io,
+    net::SocketAddr,
+    path::PathBuf,
+    slice::Iter,
+};
+
 #[cfg(unix)]
 use crate::unix;
-use std;
-use std::io;
-use std::slice::Iter;
-use std::net::SocketAddr;
-use std::path::PathBuf;
-use std::collections::HashMap;
+
 use super::Listener;
 
 /// Used internally.

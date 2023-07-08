@@ -1,19 +1,24 @@
-use libc;
-use nix::errno::Errno;
-use nix::fcntl::FcntlArg;
-use nix::sys::stat::SFlag;
-use nix;
-use std::collections::HashMap;
-use std::ffi::CString;
-use std::fs::File;
-use std::io;
-use std::io::{BufRead,BufReader};
-use std::net::{TcpStream, TcpListener};
-use std::os::unix::io::{RawFd,FromRawFd,IntoRawFd,AsRawFd};
-use std::os::unix::net::UnixListener;
-use std::path::{Path,PathBuf};
-use std::slice::Iter;
-use std;
+use std::{
+    collections::HashMap,
+    ffi::CString,
+    fs::File,
+    io,
+    io::{BufRead, BufReader},
+    net::{TcpStream, TcpListener},
+    os::unix::{
+        io::{RawFd,FromRawFd,IntoRawFd,AsRawFd},
+        net::UnixListener,
+    },
+    path::{Path, PathBuf},
+    slice::Iter,
+};
+
+use nix::{
+    fcntl::FcntlArg,
+    sys::stat::SFlag,
+    sys::socket::SockaddrIn,
+};
+
 use super::{Listener, ParanoidTcpListener, OptionHandler, OptionParseOutcome};
 
 fn fd_ok(fd: RawFd) -> bool {
@@ -21,7 +26,7 @@ fn fd_ok(fd: RawFd) -> bool {
         // The file descriptor is open and valid.
         Ok(_) => true,
         // The file descriptor is not open.
-        Err(nix::Error::Sys(Errno::EBADF)) => false,
+        Err(nix::Error::EBADF) => false,
         // The fcntl call failed for some other reason. Panic, for all the good
         // that'll do.
         Err(e) => panic!("error calling fcntl({}): {}", fd, e),
@@ -125,10 +130,9 @@ pub fn fix_fds(env: &HashMap<String,String>) -> Option<Box<dyn Listener>> {
     }
     if fd0_ok && have_sock {
         if let Some(list) = env.get("FCGI_WEB_SERVER_ADDRS") {
-            let result = nix::sys::socket::getsockname(0);
-            use nix::sys::socket::SockAddr;
+            let result: Result<SockaddrIn, _> = nix::sys::socket::getsockname(0);
             match result {
-                Ok(SockAddr::Inet(_)) => {
+                Ok(_) => {
                     Some(Box::new(unsafe{
                         ParanoidTcpListener::with(TcpListener::from_raw_fd(0),
                                                   list).unwrap()
@@ -177,7 +181,7 @@ impl OptionHandler for UnixSocketOptions {
                         return OptionParseOutcome::Failed
                     },
                 };
-                match u32::from_str_radix(arg, 8) {
+                match u16::from_str_radix(arg, 8) {
                     Err(_) => {
                         eprintln!("Invalid argument for --chmod");
                         return OptionParseOutcome::Failed

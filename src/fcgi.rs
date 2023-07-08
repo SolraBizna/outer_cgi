@@ -1,16 +1,21 @@
+//! Types and constants from section 8 of the FCGI specification
+
+// We don't use every field in the FCGI specification, but we do have them in
+// this file, for completeness. Don't warn us about that, rustc. Thanks.
 #![allow(dead_code)]
-use std;
-use std::io;
-use std::io::{Read, BufRead, Write};
-use std::collections::HashMap;
-use std::net::TcpStream;
-use std::slice::Iter;
+
+use std::{
+    collections::HashMap,
+    io,
+    io::{BufRead, Read, Write},
+    net::TcpStream,
+    panic::RefUnwindSafe,
+    slice::Iter,
+};
+
 use super::{IO, Listener};
 use crate::options::{OptionHandler, OptionParseOutcome};
-use std::panic::RefUnwindSafe;
-use ctrlc;
-
-// Types and constants from the FCGI specification, section 8
+use crossbeam_channel::select;
 
 /*
  * Listening socket file number

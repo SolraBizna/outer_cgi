@@ -55,25 +55,21 @@
 //!
 //! [1]: https://tools.ietf.org/html/rfc3875
 
-#[cfg(unix)] extern crate libc;
-#[cfg(unix)] extern crate nix;
-#[cfg(unix)] mod unix;
+use std::{
+    collections::HashMap,
+    io,
+    io::{Read,BufRead,Write,BufWriter},
+    net::{SocketAddr, IpAddr, TcpStream, TcpListener},
+    panic::RefUnwindSafe,
+    path::PathBuf,
+};
 
-extern crate ctrlc;
-#[macro_use]
-extern crate crossbeam_channel;
+#[cfg(unix)] mod unix;
 
 mod fcgi;
 mod options;
 
 use options::*;
-
-use std::io;
-use std::io::{Read,BufRead,Write,BufWriter};
-use std::collections::HashMap;
-use std::net::{SocketAddr, IpAddr, TcpStream, TcpListener};
-use std::path::PathBuf;
-use std::panic::RefUnwindSafe;
 
 /// Used internally to allow Rust TcpListener to coexist with a UNIX domain
 /// socket. We also wrap the `FCGI_WEB_SERVER_ADDRS` checking in one of these.

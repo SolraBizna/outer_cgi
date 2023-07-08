@@ -1,7 +1,8 @@
-extern crate outer_cgi;
+use std::{
+    collections::HashMap,
+    io,
+};
 
-use std::io;
-use std::collections::HashMap;
 use outer_cgi::IO;
 
 fn init(max_parallelism: u32) {
