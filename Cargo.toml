@@ -1,6 +1,6 @@
 [package]
 name = "outer_cgi"
-version = "0.2.4"
+version = "0.2.5"
 authors = ["Solra Bizna <solra@bizna.name>"]
 description = "A barebones CGI/FCGI wrapper."
 license = "Zlib"

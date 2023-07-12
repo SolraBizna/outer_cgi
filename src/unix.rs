@@ -13,6 +13,7 @@ use std::{
     slice::Iter,
 };
 
+use libc::mode_t;
 use nix::{
     fcntl::FcntlArg,
     sys::stat::SFlag,
@@ -181,7 +182,7 @@ impl OptionHandler for UnixSocketOptions {
                         return OptionParseOutcome::Failed
                     },
                 };
-                match u16::from_str_radix(arg, 8) {
+                match mode_t::from_str_radix(arg, 8) {
                     Err(_) => {
                         eprintln!("Invalid argument for --chmod");
                         return OptionParseOutcome::Failed
