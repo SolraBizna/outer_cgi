@@ -448,9 +448,9 @@ impl<'a, 'z> Instance<'a, 'z> {
         Ok(())
     }
     fn handle_request<H>(&mut self, handler: &H,
-                         mut env: HashMap<String,String>) -> io::Result<()>
+                         mut env: HashMap<String,String>) -> anyhow::Result<()>
     where H: Fn(&mut dyn IO, HashMap<String, String>)
-                -> io::Result<i32> {
+                -> anyhow::Result<i32> {
         // get a BEGIN_REQUEST record
         self.begin_request()?;
         // read the parameters
@@ -476,8 +476,8 @@ impl<'a, 'z> Instance<'a, 'z> {
     }
     pub fn handle_requests<H>(&mut self, handler: &H,
                               static_env: &HashMap<String,String>)
-                              -> io::Result<()>
-    where H: Fn(&mut dyn IO, HashMap<String, String>) -> io::Result<i32> {
+                              -> anyhow::Result<()>
+    where H: Fn(&mut dyn IO, HashMap<String, String>) -> anyhow::Result<i32> {
         // keep_conn is initially true; it will be set to false when we receive
         // a BEGIN_REQUEST without KEEP_CONN. In the usual case, the first
         // BEGIN_REQUEST would lack KEEP_CONN, and therefore we would loop only
@@ -638,7 +638,7 @@ pub fn listen_loop<H>(mut listener: Box<dyn Listener>, handler: H,
                       options: Options,
                       static_env: &HashMap<String,String>)
                       -> i32
-where H: 'static + Fn(&mut dyn IO, HashMap<String, String>) -> io::Result<i32>
+where H: 'static + Fn(&mut dyn IO, HashMap<String, String>) -> anyhow::Result<i32>
     + Sync + Send + Copy + RefUnwindSafe {
     use crossbeam_channel as cc;
     // Lie to the borrow checker. The difficult-to-encode assumption is that

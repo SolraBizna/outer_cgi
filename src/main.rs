@@ -1,7 +1,4 @@
-use std::{
-    collections::HashMap,
-    io,
-};
+use std::collections::HashMap;
 
 use outer_cgi::IO;
 
@@ -10,7 +7,7 @@ fn init(max_parallelism: u32) {
               max_parallelism);
 }
 
-fn handler(io: &mut dyn IO, env: HashMap<String,String>) -> io::Result<i32> {
+fn handler(io: &mut dyn IO, env: HashMap<String,String>) -> anyhow::Result<i32> {
     io.write_all(b"Content-type: text/plain; charset=utf-8\n\n\
                    Hello world!\n\n")?;
     let mut kvs: Vec<(String,String)> = env.into_iter().collect();

@@ -1,6 +1,6 @@
 [package]
 name = "outer_cgi"
-version = "0.2.5"
+version = "0.3.0"
 authors = ["Solra Bizna <solra@bizna.name>"]
 description = "A barebones CGI/FCGI wrapper."
 license = "Zlib"
@@ -10,6 +10,7 @@ edition = "2018"
 [dependencies]
 ctrlc = "3.4"
 crossbeam-channel = "0.5"
+anyhow = "1.0.72"
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"

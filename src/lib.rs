@@ -31,10 +31,9 @@
 //! ```rust,no_run
 //! extern crate outer_cgi;
 //! use std::collections::HashMap;
-//! use std::io;
 //! use outer_cgi::IO;
 //!
-//! fn handler(io: &mut IO, env: HashMap<String, String>) -> io::Result<i32> {
+//! fn handler(io: &mut IO, env: HashMap<String, String>) -> anyhow::Result<i32> {
 //!     io.write_all(format!(r#"Content-type: text/plain; charset=utf-8
 //!
 //! Hello World! Your request method was "{}"!
@@ -216,7 +215,7 @@ impl<R: BufRead, W: Write> IO for DualIO<R, W> {
 /// [1]: https://tools.ietf.org/html/rfc3875
 pub fn main<I, H>(init: I, handler: H) -> !
 where I: 'static + Fn(u32),
-      H: 'static + Fn(&mut dyn IO, HashMap<String, String>) -> io::Result<i32>
+      H: 'static + Fn(&mut dyn IO, HashMap<String, String>) -> anyhow::Result<i32>
     + Sync + Send + Copy + RefUnwindSafe {
     use std::process::exit;
     match sub_main(init, handler) {
@@ -228,9 +227,9 @@ where I: 'static + Fn(u32),
     }
 }
 
-fn sub_main<I, H>(init: I, handler: H) -> io::Result<i32>
+fn sub_main<I, H>(init: I, handler: H) -> anyhow::Result<i32>
 where I: 'static + Fn(u32),
-      H: 'static + Fn(&mut dyn IO, HashMap<String, String>) -> io::Result<i32>
+      H: 'static + Fn(&mut dyn IO, HashMap<String, String>) -> anyhow::Result<i32>
     + Sync + Send + Copy + RefUnwindSafe {
     let args: Vec<String> = std::env::args().collect();
     let static_env: HashMap<String, String> = std::env::vars().collect();
