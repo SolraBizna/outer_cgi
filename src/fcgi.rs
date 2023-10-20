@@ -137,7 +137,7 @@ fn read_length<T: io::Read>(reader: &mut T) -> Option<io::Result<u32>> {
             Ok(()) => (),
             Err(x) => return Some(Err(x)),
         }
-        Some(Ok((((b1[0] & 0x80) as u32) << 24)
+        Some(Ok((((b1[0] ^ 0x80) as u32) << 24)
                 | ((b2[0] as u32) << 16)
                 | ((b2[1] as u32) << 8)
                 | ((b2[2] as u32))))
